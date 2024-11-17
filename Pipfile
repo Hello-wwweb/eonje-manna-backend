@@ -7,6 +7,8 @@ name = "pypi"
 django = "==4.2"
 djangorestframework = "*"
 drf-yasg = "*"
+mysqlclient = "*"
+django-environ = "*"
 
 [dev-packages]
 
