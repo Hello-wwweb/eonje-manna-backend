@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from common.models.timestamped_model import TimeStampedModel
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
@@ -25,7 +27,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(username, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, TimeStampedModel):
     username = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128)
 
@@ -46,3 +48,7 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+    class Meta:
+        db_table = 'custom_user'
+        verbose_name = '유저'
