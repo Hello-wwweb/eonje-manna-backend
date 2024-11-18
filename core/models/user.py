@@ -4,7 +4,7 @@ from django.db import models
 from common.models.timestamped_model import TimeStampedModel
 
 
-class CustomUserManager(BaseUserManager):
+class Manager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
         if not username:
             raise ValueError("The Username field must be set")
@@ -27,7 +27,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(username, password, **extra_fields)
 
 
-class CustomUser(AbstractBaseUser, TimeStampedModel):
+class User(AbstractBaseUser, TimeStampedModel):
     username = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128)
 
@@ -35,7 +35,7 @@ class CustomUser(AbstractBaseUser, TimeStampedModel):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
-    objects = CustomUserManager()
+    objects = Manager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []

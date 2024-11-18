@@ -9,7 +9,7 @@ class Event(TimeStampedModel):
     description = models.TextField(blank=True, null=True)
     event_date = models.DateTimeField(null=True)
     event_location = models.CharField(max_length=255, null=True)
-    created_by = models.ForeignKey('core.member', on_delete=models.PROTECT)
+    created_by = models.ForeignKey('core.User', on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'event'
