@@ -12,20 +12,24 @@ from core.models.vote import Vote
 # Register your models here.
 class CustomUserAdmin(admin.ModelAdmin):
     model = User
-    list_display = ('id', 'username', 'is_active')
-    search_fields = ('username',)
-    ordering = ('username',)
+    list_display = ("id", "username", "is_active")
+    search_fields = ("username",)
+    ordering = ("username",)
 
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Status', {'fields': ('is_active',)}),
+        (None, {"fields": ("username", "password")}),
+        ("Status", {"fields": ("is_active",)}),
     )
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'is_active')},
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "password1", "password2", "is_active"),
+            },
         ),
     )
+
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(MeetingGroup)

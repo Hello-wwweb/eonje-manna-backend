@@ -13,14 +13,14 @@ class LoginView(APIView):
 
     @swagger_auto_schema(
         request_body=LoginSerializer,
-        responses={200: 'Login successful', 401: 'Invalid credentials'}
+        responses={200: "Login successful", 401: "Invalid credentials"},
     )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        username = serializer.data['username']
-        password = serializer.data['password']
+        username = serializer.data["username"]
+        password = serializer.data["password"]
 
         user = authenticate(username=username, password=password)
 
@@ -28,4 +28,6 @@ class LoginView(APIView):
             login(request, user)
             return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            )

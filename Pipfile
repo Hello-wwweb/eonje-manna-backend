@@ -11,6 +11,9 @@ mysqlclient = "*"
 django-environ = "*"
 
 [dev-packages]
+pre-commit = "*"
+flake8 = "*"
+black = "*"
 
 [requires]
 python_version = "3.12"

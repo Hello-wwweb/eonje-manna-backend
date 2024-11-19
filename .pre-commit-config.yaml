@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.9.1  # black의 특정 버전을 명시 (최신 버전을 확인)
+    hooks:
+      - id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: debug-statements

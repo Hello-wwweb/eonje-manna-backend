@@ -7,5 +7,13 @@ from .event import Event
 from .event_data_selection import EventDateSelection
 from .event_location_selection import EventLocationSelection
 
-__all__ = ['User', 'MeetingGroup', 'Membership', 'Member', 'Vote', 'Event', 'EventDateSelection', 'EventLocationSelection']
-
+__all__ = [
+    "User",
+    "MeetingGroup",
+    "Membership",
+    "Member",
+    "Vote",
+    "Event",
+    "EventDateSelection",
+    "EventLocationSelection",
+]
