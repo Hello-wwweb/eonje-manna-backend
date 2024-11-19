@@ -5,6 +5,7 @@ from core.models.event_location_selection import EventLocationSelection
 from core.models.meeting_group import MeetingGroup
 from core.models.user import User
 from core.models.membership import Membership
+from core.models.member import Member
 from core.models.vote import Vote
 
 
@@ -28,6 +29,7 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(MeetingGroup)
+admin.site.register(Member)
 admin.site.register(Membership)
 admin.site.register(Event)
 admin.site.register(EventDateSelection)
