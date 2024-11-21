@@ -22,6 +22,13 @@ from drf_yasg import openapi
 
 from core.views.login import LoginView
 from core.views.signup import SignupView
+from core.views.meeting_group import (
+    group_list,
+    group_detail,
+    group_create,
+    group_delete,
+    group_edit,
+)
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -51,4 +58,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("login/", LoginView.as_view()),
     path("signup/", SignupView.as_view()),
+    path("groups/", group_list, name="group_list"),
+    path("groups/<int:id>/", group_detail, name="group_detail"),
+    path("groups/create/", group_create, name="group_create"),
+    path("groups/<int:id>/edit/", group_edit, name="group_edit"),
+    path("groups/<int:id>/delete/", group_delete, name="group_delete"),
 ]
