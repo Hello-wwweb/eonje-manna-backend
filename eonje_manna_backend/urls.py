@@ -19,9 +19,18 @@ from django.urls import path, re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.urls import path
 
 from core.views.login import LoginView
 from core.views.signup import SignupView
+
+from core.views.event import (
+    create_event,
+    update_event,
+    delete_event,
+    retrieve_event
+)
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -43,4 +52,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view()),
     path('signup/', SignupView.as_view()),
+    path("event/", create_event, name="create_event"),
+    path("event/<int:event_id>/", retrieve_event, name="retrieve_event"),
+    path("event/<int:event_id>/update/", update_event, name="update_event"),
+    path("event/<int:event_id>/delete/", delete_event, name="delete_event")
 ]
