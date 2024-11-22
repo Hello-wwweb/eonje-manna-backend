@@ -1,9 +1,11 @@
+from enum import member
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import MeetingGroup
+from core.models import MeetingGroup, Member, Membership
 from core.serializers.meeting_group import MeetingGroupSerializer, MeetingGroupRequestSerializer
 from drf_yasg.utils import swagger_auto_schema
 
@@ -15,7 +17,8 @@ class MeetingGroupListView(APIView):
     )
     def get(self, request):
         user = request.user
-        meeting_groups = MeetingGroup.objects.filter(created_by=user)
+        user_member = Member.objects.get(uesr = user)
+        meeting_groups = Membership.objects.filter(member=user_member) # 만든 사람이 아니라, 속한 그룹을 가져와야
         serializer = MeetingGroupSerializer(meeting_groups, many=True)
         return Response(serializer.data)
 
@@ -47,7 +50,10 @@ class MeetingGroupDetailView(APIView):
             404: "Meeting Group not found",
         },
     )
-    def get(self, request, pk):
+    def get(self, request, pk):  #authenticate 필요
+        user = request.user
+        user_member = Member.objects.get(uesr=user)
+        meeting_groups = Membership.objects.filter(member=user_member)
         obj = self.get_object(pk)
         serializer = MeetingGroupSerializer(obj)
         return Response(serializer.data)
