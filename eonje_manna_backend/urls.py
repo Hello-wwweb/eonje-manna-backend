@@ -24,6 +24,7 @@ from core.views.event import EventDetailView, EventListView
 from core.views.login import LoginView
 from core.views.meeting_group import MeetingGroupListView, MeetingGroupDetailView
 from core.views.signup import SignupView
+from core.views.vote import VoteListView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -57,4 +58,6 @@ urlpatterns = [
     path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
     path("event/", EventListView.as_view()),
     path("event/<int:pk>", EventDetailView.as_view()),
+    path("vote/", VoteListView.as_view()),
+
 ]
