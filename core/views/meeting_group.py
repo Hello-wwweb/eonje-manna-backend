@@ -31,7 +31,7 @@ class MeetingGroupListView(APIView):
         serializer = MeetingGroupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(created_by=user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class MeetingGroupDetailView(APIView):
     def get_object(self, pk):
