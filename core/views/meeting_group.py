@@ -65,9 +65,9 @@ class MeetingGroupDetailView(APIView):
         serializer = MeetingGroupSerializer(obj, data=request.data)
         if serializer.is_valid():
             serializer.save()
-
             return Response(serializer.data)
-
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     @swagger_auto_schema(
         responses={
             204: "No Content",
