@@ -63,4 +63,5 @@ urlpatterns = [
     path("groups/create/", group_create, name="group_create"),
     path("groups/<int:id>/edit/", group_edit, name="group_edit"),
     path("groups/<int:id>/delete/", group_delete, name="group_delete"),
+    path("eventlocation/", EventLocationSelectionView.as_view()),
 ]
