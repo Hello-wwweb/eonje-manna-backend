@@ -56,6 +56,7 @@ class MeetingGroupListView(APIView):
         return Response(group_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class MeetingGroupDetailView(APIView):
     def get_object(self, pk):
         try:
