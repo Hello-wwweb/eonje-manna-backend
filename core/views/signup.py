@@ -24,15 +24,15 @@ class SignupView(APIView):
                 password = serializer.validated_data["password"]
                 name = serializer.validated_data["name"]
                 with transaction.atomic():
-                email = serializer.validated_data["email"]
-                user = User.objects.create_user(
-                    username=username, password=password
-                )
-                Member.objects.create(user=user, name=name, email=email)
+                    email = serializer.validated_data["email"]
+                    user = User.objects.create_user(
+                        username=username, password=password
+                    )
+                    Member.objects.create(user=user, name=name, email=email)
 
-                return Response(
-                    {"message": "Signup successful"}, status=status.HTTP_200_OK
-                )
+                    return Response(
+                        {"message": "Signup successful"}, status=status.HTTP_200_OK
+                    )
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
