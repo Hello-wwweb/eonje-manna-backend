@@ -16,7 +16,7 @@ class SignupView(APIView):
         request_body=SignupSerializer,
         responses={200: "Signup successful", 400: "Invalid data"},
     )
-    def post(self, request):
+    def post(self, request):                     ###### valid한 email형식, unique 걸러내기?
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             try:
