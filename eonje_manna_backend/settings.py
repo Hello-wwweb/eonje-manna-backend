@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_yasg",
-    'corsheaders'
+    'corsheaders',
     "core",
 ]
 
@@ -62,7 +62,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # 세션 인증 및 쿠키 전송 허용
-CORS_ALLOW_CREDENTIALS = Tru
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "eonje_manna_backend.urls"
 
