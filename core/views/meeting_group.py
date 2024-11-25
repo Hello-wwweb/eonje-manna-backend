@@ -36,6 +36,7 @@ class MeetingGroupListView(APIView):
     )
     def post(self, request):
         user = request.user
+
         user_member = Member.objects.get(user=user)
         group_serializer = MeetingGroupSerializer(data=request.data)
         if group_serializer.is_valid():
@@ -54,6 +55,7 @@ class MeetingGroupListView(APIView):
             return Response(group_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(group_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class MeetingGroupDetailView(APIView):
