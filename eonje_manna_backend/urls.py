@@ -22,8 +22,8 @@ from drf_yasg import openapi
 
 from core.views.event import EventDetailView, EventListView
 from core.views.login import LoginView
-from core.views.meeting_group import MeetingGroupListView, MeetingGroupDetailView
-from core.views.membership import MembershipDetailView, GroupMemberListView
+from core.views.group import MeetingGroupListView, MeetingGroupDetailView, GroupMemberListView
+from core.views.membership import MembershipDetailView
 from core.views.signup import SignupView
 from core.views.vote import VoteListView
 
