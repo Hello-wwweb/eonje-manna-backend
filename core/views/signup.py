@@ -23,8 +23,8 @@ class SignupView(APIView):
                 username = serializer.validated_data["username"]
                 password = serializer.validated_data["password"]
                 name = serializer.validated_data["name"]
-                email = serializer.validated_data["email"]
                 with transaction.atomic():
+                    email = serializer.validated_data["email"]
                     user = User.objects.create_user(
                         username=username, password=password
                     )
