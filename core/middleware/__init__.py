@@ -1,0 +1,1 @@
+from core.middleware.cors_middleware import CorsMiddleware
