@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Event, MeetingGroup
+from core.models import Event, MeetingGroup, Member, Membership
 from core.serializers.event import EventSerializer, EventRequestforPostSerializer, \
     EventRequestforPatchSerializer
 from drf_yasg.utils import swagger_auto_schema
@@ -17,31 +17,12 @@ class EventListView(APIView):
     )
     def get(self, request):
         user = request.user
-        events = Event.objects.filter(created_by=user)
+        user_member = Member.objects.get(user=user)
+        user_group = Membership.objects.filter(member = user_member).values_list('group', flat=True)
+        events = Event.objects.filter(group__in = user_group)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
-    @swagger_auto_schema(
-        request_body=EventRequestforPostSerializer,
-        responses={
-            201: EventSerializer(),
-            400: "Bad Request",
-            404: "Group not found",
-        },
-    )
-    def post(self, request):
-        user = request.user
-
-
-        # 그룹 존재
-        group_id = request.data.get('group')  # 그룹 ID?
-        if not MeetingGroup.objects.filter(id=group_id).exists():
-            return Response({'error': 'Group not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = EventSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(created_by=user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class EventDetailView(APIView):
     def get_object(self, pk):
@@ -61,6 +42,28 @@ class EventDetailView(APIView):
         obj = self.get_object(pk)
         serializer = EventSerializer(obj)
         return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=EventRequestforPostSerializer,
+        responses={
+            201: EventSerializer(),
+            400: "Bad Request",
+            404: "Group not found",
+        },
+    )
+    def post(self, request, pk):
+        user = request.user
+        obj = self.get_object(pk)
+        # 그룹 존재
+        group_id = request.data.get('group')  # 그룹 ID?
+        if not MeetingGroup.objects.filter(id=group_id).exists():
+            return Response({'error': 'Group not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = EventSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(created_by=user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 ################################
     @swagger_auto_schema(
