@@ -21,9 +21,12 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from core.views.event import EventDetailView, EventListView
 from core.views.login import LoginView
 from core.views.meeting_group import MeetingGroupListView, MeetingGroupDetailView
+from core.views.membership import MembershipDetailView
 from core.views.signup import SignupView
+from core.views.vote import VoteListView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -56,6 +59,11 @@ urlpatterns = [
     path("groups/", MeetingGroupListView.as_view()),
     path('event-date-selections/', EventDateSelectionView.as_view()),
     #path('event-date-selections/<int:pk>', EventDateSelectionView.as_view()),
-    path('event-date-selections/all', EventDateSelectionView.as_view()),
-    path('event-date-selections/result', EventDateSelectionResultView.as_view())
-]
+    path('event-date-selections/all', EventDateSelectionAllView.as_view()),
+    path('event-date-selections/result', EventDateSelectionResultView.as_view()),
+    path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
+    path('groups/<int:pk>/membership/',MembershipDetailView.as_view()),
+    path("event/", EventListView.as_view()),
+    path("event/<int:pk>", EventDetailView.as_view()),
+    path("vote/", VoteListView.as_view())
+    ]   

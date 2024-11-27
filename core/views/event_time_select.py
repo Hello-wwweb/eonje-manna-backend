@@ -9,10 +9,15 @@ from core.serializers.event_time_selection import EventDateSelectionRequestSeria
 
 class EventDateSelectionView(APIView):
     @swagger_auto_schema(
-        request_body=EventDateSelectionRequestSerializer,  # 요청 본문을 설명
+        request_body=EventDateSelectionRequestSerializer,
         responses={
-            201: EventDateSelectionSerializer,  # 성공 응답 정의
-            400: "Invalid input"               # 실패 응답 정의
+            201: EventDateSelectionSerializer,
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                }
+            )
         },
         operation_summary="Create Event Date Selection",
         operation_description="Creates a new EventDateSelection object with the provided member, event, and selected dates."
@@ -20,8 +25,8 @@ class EventDateSelectionView(APIView):
     def post(self, request):
         serializer = EventDateSelectionRequestSerializer(data=request.data)
         user = request.user
-    
-        # request.user와 연결된 Member 객체 가져오기
+
+        # Member 객체 가져오기
         try:
             member = Member.objects.get(user=user)
         except Member.DoesNotExist:
@@ -29,12 +34,12 @@ class EventDateSelectionView(APIView):
                 {"error": "Member not found for the current user."},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         if serializer.is_valid():
             validated_data = serializer.validated_data
             event_id = validated_data['event']
             selected_dates = validated_data['selected_dates']
-            
+
             # EventDateSelection 저장
             event_date_selection = EventDateSelection.objects.create(
                 member=member,
@@ -44,8 +49,86 @@ class EventDateSelectionView(APIView):
 
             response_serializer = EventDateSelectionSerializer(event_date_selection)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'pk',
+                openapi.IN_PATH,
+                description="Primary Key of the EventDateSelection",
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        request_body=EventDateSelectionRequestSerializer,
+        responses={
+            200: EventDateSelectionSerializer,
+            403: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Permission denied")
+                }
+            ),
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Invalid input or Event ID mismatch")
+                }
+            ),
+            404: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Record not found")
+                }
+            )
+        },
+        operation_summary="Update Event Date Selection",
+        operation_description="Replaces the selected dates for the provided EventDateSelection, removing all existing entries."
+    )
+    def patch(self, request, pk):  # 기존 데이터 삭제 후 새로운 데이터 추가
+        try:
+            record = EventDateSelection.objects.get(pk=pk)
+        except EventDateSelection.DoesNotExist:
+            return Response({"error": f"EventDateSelection with pk {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        try:
+            request_member = Member.objects.get(user=user)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Member not found for the current user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if record.member != request_member:
+            return Response({"error": "You do not have permission to modify this record."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = EventDateSelectionRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        validated_data = serializer.validated_data
+        date_to_update = validated_data["selected_dates"]
+        event_id = validated_data["event"]
+
+        if event_id != record.event.id:
+            return Response(
+                {"error": f"Event ID mismatch. Expected {record.event.id}, got {event_id}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 기존 데이터 삭제 및 새로운 데이터 추가
+        record.selected_dates.clear()
+        for date, times in date_to_update.items():
+            record.selected_dates[date] = times
+
+        # 데이터 저장
+        record.save()
+
+        response_serializer = EventDateSelectionSerializer(record)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class EventDateSelectionResultView(APIView):
@@ -60,11 +143,25 @@ class EventDateSelectionResultView(APIView):
                 properties={
                     "event": openapi.Schema(type=openapi.TYPE_INTEGER, description="Event ID"),
                     "date": openapi.Schema(type=openapi.TYPE_STRING, description="Date"),
-                    "intersecting_times": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_STRING), description="List of intersecting times")
+                    "intersecting_times": openapi.Schema(
+                        type=openapi.TYPE_ARRAY,
+                        items=openapi.Items(type=openapi.TYPE_STRING),
+                        description="List of intersecting times"
+                    )
                 }
             ),
-            400: "Invalid input",
-            200: "No records found"
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Invalid input")
+                }
+            ),
+            404: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "message": openapi.Schema(type=openapi.TYPE_STRING, description="No records found")
+                }
+            )
         },
         operation_summary="Get Intersecting Times",
         operation_description="Retrieves the intersecting times for a given event and date based on all members' availability."
@@ -75,12 +172,12 @@ class EventDateSelectionResultView(APIView):
 
         if not event_id or not date_to_search:
             return Response({"error": "Missing 'event' or 'date' parameter."}, status=400)
-        
+
         event_records = EventDateSelection.objects.filter(event=event_id)
 
         if not event_records.exists():
             return Response({"message": f"No records found for event {event_id}"}, status=200)
-        
+
         intersecting_times = None
         for record in event_records:
             selected_dates = record.selected_dates
@@ -119,12 +216,26 @@ class EventDateSelectionAllView(APIView):
                     properties={
                         "member_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Member ID"),
                         "member_name": openapi.Schema(type=openapi.TYPE_STRING, description="Member Name"),
-                        "available_times": openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_STRING), description="List of available times"),
+                        "available_times": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_STRING),
+                            description="List of available times"
+                        ),
                     }
                 )
             ),
-            404: "Member not found",
-            400: "Invalid input"
+            404: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Member not found")
+                }
+            ),
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Invalid input")
+                }
+            )
         },
         operation_summary="Get All Members' Availability",
         operation_description="Retrieves the availability of all members for a specific event and date, with the requesting user's data at the top."
@@ -138,6 +249,7 @@ class EventDateSelectionAllView(APIView):
                 {"error": "Member not found for the current user."},
                 status=status.HTTP_404_NOT_FOUND
             )
+
         event_id = request.query_params.get("event")
         date_to_search = request.query_params.get("date")
 

@@ -16,32 +16,11 @@ class EventDateSelectionRequestSerializer(serializers.Serializer):
     )
     selected_dates = serializers.DictField(
         child=serializers.ListField(
-            child=serializers.TimeField(format="%H:%M"),
+            child=serializers.CharField(),
             allow_empty=False,
         ),
         required=True,
         help_text="가능한 날짜 (YYYY-MM-DD)와 해당 날짜의 가능한 시간 리스트 (HH:MM)"
     )
 
-    def validate_selected_dates(self, value):
-        """
-        Validate that keys are valid dates and values are valid time lists in HH:MM format.
-        """
-        for date, times in value.items():
-            # Validate date format
-            try:
-                datetime.strptime(date, "%Y-%m-%d")
-            except ValueError:
-                raise serializers.ValidationError(
-                    f"Invalid date format: {date}. Expected format: YYYY-MM-DD"
-                )
-
-            # Validate time list
-            for time in times:
-                try:
-                    datetime.strptime(time, "%H:%M")
-                except ValueError:
-                    raise serializers.ValidationError(
-                        f"Invalid time format: {time} in date {date}. Expected format: HH:MM"
-                    )
-        return value
+    
