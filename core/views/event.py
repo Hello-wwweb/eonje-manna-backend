@@ -8,16 +8,19 @@ from core.serializers.event import EventSerializer, EventRequestforPostSerialize
     EventRequestforPatchSerializer
 from drf_yasg.utils import swagger_auto_schema
 
-
 class EventListView(APIView):
     @swagger_auto_schema(
         responses={
             200: EventSerializer(many=True),
         },
     )
-    def get(self, request):
-        user = request.user
-        events = Event.objects.filter(created_by=user)
+    def get(self, request, group_id: int):
+        try:
+            group = MeetingGroup.objects.get(id=group_id)
+        except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        events = Event.objects.filter(group=group)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
@@ -29,18 +32,18 @@ class EventListView(APIView):
             404: "Group not found",
         },
     )
-    def post(self, request):
+    def post(self, request, group_id: int):
         user = request.user
 
+        try:
+            group = MeetingGroup.objects.get(id=group_id)
+        except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        # 그룹 존재
-        group_id = request.data.get('group')  # 그룹 ID?
-        if not MeetingGroup.objects.filter(id=group_id).exists():
-            return Response({'error': 'Group not found'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = EventSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(created_by=user)
+            serializer.save(group=group, created_by=user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class EventDetailView(APIView):
@@ -62,7 +65,6 @@ class EventDetailView(APIView):
         serializer = EventSerializer(obj)
         return Response(serializer.data)
 
-################################
     @swagger_auto_schema(
         request_body=EventRequestforPatchSerializer,
         responses={
@@ -80,7 +82,8 @@ class EventDetailView(APIView):
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-#############################
+
+
     @swagger_auto_schema(
         responses={
             204: "No Content",

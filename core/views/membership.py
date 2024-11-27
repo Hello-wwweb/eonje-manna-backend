@@ -12,6 +12,26 @@ from drf_yasg.utils import swagger_auto_schema
 from core.serializers.membership import MembershipSerializer, MembershipInviteSerializer
 
 
+class GroupMemberListView(APIView):
+    def get_group(self, group_id: int):
+        try:
+            return MeetingGroup.objects.get(id=group_id)
+        except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
+            return None
+
+    def get(self, request, group_id: int):
+        group = self.get_group(group_id)
+        if group is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        members = Membership.objects.filter(group=group)
+        serializer = MembershipSerializer(members, many=True)
+        return Response(serializer.data)
+
+
+
+
+
 class MembershipDetailView(APIView):
     def get_group(self, pk):
         try:
