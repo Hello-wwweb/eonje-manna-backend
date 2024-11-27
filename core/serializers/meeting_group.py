@@ -5,7 +5,7 @@ from core.models import MeetingGroup
 class MeetingGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = MeetingGroup
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name', 'description', 'created_by']
 
 
 class MeetingGroupRequestSerializer(serializers.Serializer):
