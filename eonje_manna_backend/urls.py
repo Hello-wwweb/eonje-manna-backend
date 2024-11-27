@@ -23,7 +23,7 @@ from drf_yasg import openapi
 from core.views.event import EventDetailView, EventListView
 from core.views.login import LoginView
 from core.views.group import MeetingGroupListView, MeetingGroupDetailView, GroupMemberListView
-from core.views.membership import MembershipDetailView
+from core.views.membership import MembershipDetailView, MembershipListView
 from core.views.signup import SignupView
 from core.views.vote import VoteListView
 
@@ -57,7 +57,8 @@ urlpatterns = [
     path("signup/", SignupView.as_view()),
     path("groups/", MeetingGroupListView.as_view()),
     path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
-    path('groups/<int:pk>/membership/', MembershipDetailView.as_view()),
+    path("groups/<int:group_id>/memberships/", MembershipListView.as_view()),
+    path('groups/<int:group_id>/memberships/<int:pk>', MembershipDetailView.as_view()),
     path('groups/<int:group_id>/members/', GroupMemberListView.as_view()),
     path("groups/<int:group_id>/events/", EventListView.as_view()),
     path("groups/<int:group_id>/events/<int:pk>", EventDetailView.as_view()),
