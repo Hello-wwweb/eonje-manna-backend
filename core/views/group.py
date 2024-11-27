@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import MeetingGroup, Member, Membership
+from core.serializers.group_member import GroupMemberSerializer
 from core.serializers.meeting_group import MeetingGroupSerializer, MeetingGroupRequestSerializer
 from drf_yasg.utils import swagger_auto_schema
 
@@ -126,3 +127,20 @@ class MeetingGroupDetailView(APIView):
         obj.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GroupMemberListView(APIView):
+    def get_group(self, group_id: int):
+        try:
+            return MeetingGroup.objects.get(id=group_id)
+        except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
+            return None
+
+    def get(self, request, group_id: int):
+        group = self.get_group(group_id)
+        if group is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        members = Membership.objects.filter(group=group)
+        serializer = GroupMemberSerializer(members, many=True)
+        return Response(serializer.data)

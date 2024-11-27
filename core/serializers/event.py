@@ -11,7 +11,6 @@ class EventSerializer(serializers.ModelSerializer):
 
 
 class EventRequestforPostSerializer(serializers.Serializer):
-
     name = serializers.CharField()
     description = serializers.CharField()
 
