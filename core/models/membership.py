@@ -12,3 +12,6 @@ class Membership(TimeStampedModel):
     class Meta:
         db_table = "membership"
         verbose_name = "모임 멤버"
+        constraints = [
+            models.UniqueConstraint(fields=['member', 'group'], name='unique_membership')
+        ]

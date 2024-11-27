@@ -58,8 +58,8 @@ urlpatterns = [
     path("groups/", MeetingGroupListView.as_view()),
     path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
     path('groups/<int:pk>/membership/', MembershipDetailView.as_view()),
-    path('groups/<int:group_id>/members', GroupMemberListView.as_view()),
-    path("groups/<int:group_id>/events", EventListView.as_view()),
+    path('groups/<int:group_id>/members/', GroupMemberListView.as_view()),
+    path("groups/<int:group_id>/events/", EventListView.as_view()),
     path("groups/<int:group_id>/events/<int:pk>", EventDetailView.as_view()),
     path("vote/", VoteListView.as_view()),
 

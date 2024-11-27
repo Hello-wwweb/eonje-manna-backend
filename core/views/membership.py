@@ -1,5 +1,6 @@
 from enum import member
 
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -11,7 +12,36 @@ from drf_yasg.utils import swagger_auto_schema
 
 from core.serializers.membership import MembershipSerializer, MembershipInviteSerializer
 
+class MembershipListView(APIView):
+    def post(self, request, group_id: int, *args, **kwargs):
+        serializer = MembershipInviteSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.data.get('email')
 
+            try:
+                member = Member.objects.get(email=email)
+            except Member.DoesNotExist:
+                return Response({"detail": "Member not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            try:
+                group = MeetingGroup.objects.get(id=group_id)
+            except MeetingGroup.DoesNotExist:
+                return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            try:
+                membership = Membership.objects.create(
+                    member=member,
+                    group=group,
+                    nickname=member.name
+                )
+
+            except IntegrityError:
+                return Response({"detail": "Member is already a member of this group."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(MembershipSerializer(membership).data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MembershipDetailView(APIView):
     def get_group(self, pk):
