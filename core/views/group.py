@@ -11,6 +11,7 @@ from core.serializers.group_member import GroupMemberSerializer
 from core.serializers.meeting_group import MeetingGroupSerializer, MeetingGroupRequestSerializer
 from drf_yasg.utils import swagger_auto_schema
 
+from core.serializers.group_member import MemberInfoSerializer
 from core.serializers.membership import MembershipSerializer
 
 
