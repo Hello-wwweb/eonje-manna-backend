@@ -41,7 +41,7 @@ class EventListView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-        serializer = EventSerializer(data=request.data)
+        serializer = EventRequestforPostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(group=group, created_by=user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
