@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
+from core.views.event_time_select import EventDateSelectionView,EventDateSelectionDetailView,EventDateSelectionAvailableUsersCountView, EventDateSelectionDetailView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -56,12 +57,20 @@ urlpatterns = [
     path("login/", LoginView.as_view()),
     path("signup/", SignupView.as_view()),
     path("groups/", MeetingGroupListView.as_view()),
+    path('event-date-selections/', EventDateSelectionView.as_view()),
+    path('event-date-selections/<int:pk>', EventDateSelectionDetailView.as_view()),
+    # path('event-date-selections/all', EventDateSelectionAllView.as_view()),
+    # path('event-date-selections/result', EventDateSelectionResultView.as_view()),
+
+    path('event-date-selections/detail', EventDateSelectionDetailView.as_view()),
+    path('event-date-selections/AvailableUsersCount', EventDateSelectionAvailableUsersCountView.as_view()),
     path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
     path("groups/<int:group_id>/memberships/", MembershipListView.as_view()),
     path('groups/<int:group_id>/memberships/<int:pk>', MembershipDetailView.as_view()),
     path('groups/<int:group_id>/members/', GroupMemberListView.as_view()),
     path("groups/<int:group_id>/events/", EventListView.as_view()),
     path("groups/<int:group_id>/events/<int:pk>", EventDetailView.as_view()),
-    path("vote/", VoteListView.as_view()),
+    path("votes/", VoteListView.as_view()),
 
 ]
+
