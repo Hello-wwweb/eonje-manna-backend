@@ -151,7 +151,6 @@ class EventDateSelectionDetailView(APIView):
                 )
 
             # 기존 데이터 삭제 및 새로운 데이터 추가
-            record.selected_dates.clear()
             for date, times in date_to_update.items():
                 record.selected_dates[date] = times
 
