@@ -12,6 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from core.serializers.membership import MembershipSerializer, MembershipInviteSerializer, MembershipNicknameSerializer
 
 
+
 class MembershipDetailView(APIView):
     def get_group(self, pk):
         try:

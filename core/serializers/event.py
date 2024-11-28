@@ -10,9 +10,11 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ['id', 'group', 'name', 'description', 'event_date', 'event_location']
 
 
-class EventRequestforPostSerializer(serializers.Serializer):
+class EventRequestSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField()
+    event_date = serializers.DateTimeField(required=False)
+    event_location = serializers.CharField(required=False)
 
 
 

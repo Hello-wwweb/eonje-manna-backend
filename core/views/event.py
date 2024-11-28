@@ -3,9 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Event, MeetingGroup, Member, Membership
-from core.serializers.event import EventSerializer, EventRequestforPostSerializer, \
-    EventRequestforPatchSerializer
+from core.models import Event, MeetingGroup
+from core.serializers.event import EventSerializer, \
+    EventRequestforPatchSerializer, EventRequestSerializer
+
 from drf_yasg.utils import swagger_auto_schema
 class MyEventListView(APIView):
     @swagger_auto_schema(
@@ -24,14 +25,13 @@ class MyEventListView(APIView):
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
-
 class EventListView(APIView):
     @swagger_auto_schema(
         responses={
             200: EventSerializer(many=True),
         },
     )
-    def get(self, request, group_id: int): # overload?
+    def get(self, request, group_id: int):
         try:
             group = MeetingGroup.objects.get(id=group_id)
         except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
@@ -42,7 +42,7 @@ class EventListView(APIView):
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        request_body=EventRequestforPostSerializer,
+        request_body=EventRequestSerializer,
         responses={
             201: EventSerializer(),
             400: "Bad Request",
@@ -57,11 +57,24 @@ class EventListView(APIView):
         except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-
-        serializer = EventRequestforPostSerializer(data=request.data)
+        serializer = EventRequestSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(group=group, created_by=user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            name = serializer.validated_data.get('name')
+            description = serializer.validated_data.get('description')
+            event_date = serializer.validated_data.get('event_date', None)
+            event_location = serializer.validated_data.get('event_location', None)
+
+            event = Event.objects.create(
+                name=name,
+                description=description,
+                group=group,
+                created_by=user,
+                event_date=event_date,
+                event_location=event_location
+            )
+
+            return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventDetailView(APIView):
     def get_object(self, pk):
