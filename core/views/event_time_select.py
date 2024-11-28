@@ -56,7 +56,7 @@ class EventDateSelectionView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class EventDateSelectionEdit(APIView):
+class EventDateSelectionDetailView(APIView):
         @swagger_auto_schema(
     manual_parameters=[
         openapi.Parameter(
