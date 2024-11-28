@@ -9,7 +9,7 @@ class EventDateSelectionSerializer(serializers.ModelSerializer):
         model = EventDateSelection
         fields = ['id', 'member', 'event', 'selected_dates', 'name']
 
-    def get_nickname(self, obj):
+    def get_name(self, obj):
         return obj.member.name if obj.member else None
 
 
