@@ -1,6 +1,9 @@
 from collections import defaultdict
 from datetime import datetime
 from xml.dom import ValidationErr
+
+from django.db import IntegrityError
+
 from core.models.member import Member
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,6 +12,11 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from core.models import EventDateSelection
 from core.serializers.event_time_selection import EventDateSelectionRequestSerializer, EventDateSelectionSerializer
+
+class EventDateSelectionUserView(APIView):
+    def get(self, request, event_id, *args, **kwargs):
+        if
+
 
 class EventDateSelectionView(APIView):
     @swagger_auto_schema(
@@ -43,15 +51,26 @@ class EventDateSelectionView(APIView):
             event_id = validated_data['event']
             selected_dates = validated_data['selected_dates']
 
-            # EventDateSelection 저장
-            event_date_selection = EventDateSelection.objects.create(
-                member=member,
-                event_id=event_id,
-                selected_dates=selected_dates
-            )
+            try:
+                # EventDateSelection 저장
+                event_date_selection = EventDateSelection.objects.create(
+                    member=member,
+                    event_id=event_id,
+                    selected_dates=selected_dates
+                )
 
-            response_serializer = EventDateSelectionSerializer(event_date_selection)
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+                response_serializer = EventDateSelectionSerializer(event_date_selection)
+                return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+            except IntegrityError as e:
+                # Catching the IntegrityError (unique constraint violation)
+                return Response(
+                    {
+                        "error": "A selection for this event already exists for the current member.",
+                        "error_code": "unique_constraint_violation"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

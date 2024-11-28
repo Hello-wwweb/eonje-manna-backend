@@ -11,3 +11,6 @@ class EventDateSelection(TimeStampedModel):
     class Meta:
         db_table = "event_data_selection"
         verbose_name = "이벤트 날짜 선택"
+        constraints = [
+            models.UniqueConstraint(fields=['member', 'event'], name='unique_member_event_selection')
+        ]
