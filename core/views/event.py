@@ -111,6 +111,8 @@ class EventDetailView(APIView):
             return Response({"error": "Permission Denied"}, status=status.HTTP_403_FORBIDDEN)
 
         obj.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 # ##
 # def create_event(request):
 #     if request.method == "POST":
