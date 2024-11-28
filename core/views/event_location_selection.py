@@ -1,14 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import requests
 
 from core.models import EventLocationSelection
 from rest_framework.parsers import JSONParser
 from core.serializers.event_location_selection import EventLocationSelectionSerializer
-from core.services import NaverMapAPI
 
 
 class EventLocationSelectionView(APIView):
@@ -47,14 +46,12 @@ class EventLocationSelectionView(APIView):
         member_id = request.data.get("member_id")
         event_id = request.data.get("event_id")
 
-        # 네이버 지도 API 호출
+        # 카카오 지도 API 호출
         try:
-            # 인스턴스 생성 시 API 키를 전달
-            naver_api = NaverMapAPI(
-                client_id="lk4pjn6bhn",
-                client_secret="2HEO59y2raSXxjv1uH1MQVg7ptl5qXbKuoSUbWds",
-            )
-            reverse_geocode_result = naver_api.reverse_geocode(latitude, longitude)
+            headers = {"Authorization": "f406fe311a2173d0935a4362f3d563ab"}
+            url = f"https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x={longitude}&y={latitude}"
+            response = requests.get(url, headers=headers)
+            reverse_geocode_result = response.json()
 
             if "error" in reverse_geocode_result:
                 return Response(
@@ -65,16 +62,13 @@ class EventLocationSelectionView(APIView):
                 )
 
             # 주소 정보 파싱
-            address = (
-                reverse_geocode_result["results"][0]["region"]["area1"]["name"]
-                + reverse_geocode_result["results"][0]["region"]["area2"]["name"]
-            )
+            address = reverse_geocode_result["documents"][0]["address"]["address_name"]
         except Exception as e:
             return Response(
                 {"error": f"Failed to fetch address: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return Response(address)
+
         # 장소 데이터 생성
         place_data = {
             "member": member_id,

@@ -29,6 +29,8 @@ from core.views.meeting_group import (
     group_delete,
     group_edit,
 )
+from core.views.event_location_selection import EventLocationSelectionView
+from core.views.marker import MarkerSaveView, MarkerListView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -64,4 +66,6 @@ urlpatterns = [
     path("groups/<int:id>/edit/", group_edit, name="group_edit"),
     path("groups/<int:id>/delete/", group_delete, name="group_delete"),
     path("eventlocation/", EventLocationSelectionView.as_view()),
+    path("markers/save", MarkerSaveView.as_view(), name="marker-save"),
+    path("markers/<str:group_id>", MarkerListView.as_view(), name="marker-list"),
 ]
