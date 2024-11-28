@@ -10,4 +10,7 @@ class MembershipSerializer(serializers.ModelSerializer):
 
 
 class MembershipInviteSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=100)
+    email = serializers.CharField(max_length = 100)
+
+class MembershipNicknameSerializer(serializers.Serializer):
+    nickname = serializers.CharField(max_length = 120)

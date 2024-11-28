@@ -6,7 +6,24 @@ from rest_framework.views import APIView
 from core.models import Event, MeetingGroup
 from core.serializers.event import EventSerializer, \
     EventRequestforPatchSerializer, EventRequestSerializer
+
 from drf_yasg.utils import swagger_auto_schema
+class MyEventListView(APIView):
+    @swagger_auto_schema(
+        responses={
+            200: EventSerializer(many=True),
+        },
+    )
+    def get(self, request):
+        user_member = Member.objects.get(user = request.user)
+        try:
+            groups = Membership.objects.filter(member=user_member).values_list('group', flat=True)
+        except (MeetingGroup.DoesNotExist, MeetingGroup.MultipleObjectsReturned):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        events = Event.objects.filter(group__in=groups).order_by('event_date')
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)
 
 class EventListView(APIView):
     @swagger_auto_schema(
