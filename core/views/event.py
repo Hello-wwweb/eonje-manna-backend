@@ -65,7 +65,7 @@ class EventDetailView(APIView):
             obj = Event.objects.get(pk=pk)
             return obj
         except Event.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return None
 
     @swagger_auto_schema(
         responses={
@@ -75,6 +75,8 @@ class EventDetailView(APIView):
     )
     def get(self, request, group_id, pk):
         obj = self.get_object(pk)
+        if obj is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = EventSerializer(obj)
         return Response(serializer.data)
 
@@ -88,6 +90,9 @@ class EventDetailView(APIView):
     )
     def patch(self, request, group_id, pk):
         obj = self.get_object(pk)
+        if obj is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         serializer = EventSerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -105,6 +110,8 @@ class EventDetailView(APIView):
     )
     def delete(self, request, group_id, pk):
         obj = self.get_object(pk)
+        if obj is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         # authenticate
         if not request.user == obj.created_by:
