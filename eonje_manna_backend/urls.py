@@ -21,9 +21,10 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from core.views.event import EventDetailView, EventListView
+from core.views.event import EventDetailView, EventListView, MyEventListView
 from core.views.login import LoginView
 from core.views.group import MeetingGroupListView, MeetingGroupDetailView, GroupMemberListView
+from core.views.profile import MemberListView
 from core.views.membership import MembershipDetailView
 from core.views.signup import SignupView
 from core.views.vote import VoteListView
@@ -56,6 +57,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("login/", LoginView.as_view()),
     path("signup/", SignupView.as_view()),
+    path("profile/", MemberListView.as_view()),
+    path("events/", MyEventListView.as_view()),
     path("groups/", MeetingGroupListView.as_view()),
     path('event-date-selections/', EventDateSelectionView.as_view()),
     path('event-date-selections/edit/<int:pk>', EventDateSelectionEdit.as_view()),
