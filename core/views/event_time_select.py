@@ -13,10 +13,6 @@ from drf_yasg import openapi
 from core.models import EventDateSelection
 from core.serializers.event_time_selection import EventDateSelectionRequestSerializer, EventDateSelectionSerializer
 
-class EventDateSelectionUserView(APIView):
-    def get(self, request, event_id, *args, **kwargs):
-        if
-
 
 class EventDateSelectionView(APIView):
     @swagger_auto_schema(
