@@ -38,7 +38,7 @@ class MemberListView(APIView):
     @swagger_auto_schema(
         request_body=ProfileModifySerializer,
         responses={
-            201: ProfileSerializer(),
+            200: ProfileSerializer(),
             400: "Bad Request",
             404: "Group not found",
         },
@@ -48,7 +48,7 @@ class MemberListView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         user = request.user
-
+        user_member = Member.objects.get(user = user)
         # 기존 거랑 같은지
         old_password = serializer.validated_data.get('old_password')
         if not check_password(old_password, user.password):
@@ -56,12 +56,13 @@ class MemberListView(APIView):
 
         # 변경
         if 'name' in serializer.validated_data:
-            user.name = serializer.validated_data['name']
+            user_member.name = serializer.validated_data['name']
         if 'email' in serializer.validated_data:
-            user.email = serializer.validated_data['email']
+            user_member.email = serializer.validated_data['email']
         if 'new_password' in serializer.validated_data:
             user.set_password(serializer.validated_data['new_password'])
 
+        user_member.save()
         user.save()
 
         return Response({"message": "Profile update Successful"}, status=status.HTTP_200_OK)
