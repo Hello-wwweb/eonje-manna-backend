@@ -313,7 +313,7 @@ class EventDateSelectionDetailView(APIView):
 
 
 
-class EventDateSelectionDetailView(APIView):
+class EventDateSelectionSearchView(APIView):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
