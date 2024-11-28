@@ -4,9 +4,13 @@ from datetime import datetime
 
 
 class EventDateSelectionSerializer(serializers.ModelSerializer):
+    nickname = serializers.SerializerMethodField()
     class Meta:
         model = EventDateSelection
         fields = ['member', 'event', 'selected_dates']
+
+    def get_nickname(self, obj):
+        return obj.member.nickname if obj.member else None
 
 
 class EventDateSelectionRequestSerializer(serializers.Serializer):

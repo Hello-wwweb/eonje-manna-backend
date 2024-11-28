@@ -63,11 +63,12 @@ urlpatterns = [
     path("groups/", MeetingGroupListView.as_view()),
     path('event-date-selections/', EventDateSelectionView.as_view()),
     path('event-date-selections/<int:pk>', EventDateSelectionDetailView.as_view()),
-    # path('event-date-selections/all', EventDateSelectionAllView.as_view()),
+    path('event-date-selections/search', EventDateSelectionSearchView.as_view()),
     # path('event-date-selections/result', EventDateSelectionResultView.as_view()),
 
     path('event-date-selections/detail', EventDateSelectionDetailView.as_view()),
     path('event-date-selections/AvailableUsersCount', EventDateSelectionAvailableUsersCountView.as_view()),
+
     path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
     path("groups/<int:group_id>/memberships/", MembershipListView.as_view()),
     path('groups/<int:group_id>/memberships/<int:pk>', MembershipDetailView.as_view()),
