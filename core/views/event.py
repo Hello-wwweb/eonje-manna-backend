@@ -73,7 +73,7 @@ class EventDetailView(APIView):
             404: "Event not found",
         },
     )
-    def get(self, request, pk):
+    def get(self, request, group_id, pk):
         obj = self.get_object(pk)
         serializer = EventSerializer(obj)
         return Response(serializer.data)
@@ -86,7 +86,7 @@ class EventDetailView(APIView):
             400: "Bad Request",
         },
     )
-    def patch(self, request, pk):
+    def patch(self, request, group_id, pk):
         obj = self.get_object(pk)
         serializer = EventSerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
@@ -103,7 +103,7 @@ class EventDetailView(APIView):
             404: "Event not found",
         },
     )
-    def delete(self, request, pk):
+    def delete(self, request, group_id, pk):
         obj = self.get_object(pk)
 
         # authenticate
