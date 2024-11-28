@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from core.views.event_time_select import EventDateSelectionView,EventDateSelectionDetailView,EventDateSelectionAvailableUsersCountView
+from core.views.event_time_select import EventDateSelectionView,EventDateSelectionDetailView,EventDateSelectionAvailableUsersCountView, EventDateSelectionEdit
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -58,7 +58,7 @@ urlpatterns = [
     path("signup/", SignupView.as_view()),
     path("groups/", MeetingGroupListView.as_view()),
     path('event-date-selections/', EventDateSelectionView.as_view()),
-    path('event-date-selections/<int:pk>', EventDateSelectionView.as_view()),
+    path('event-date-selections/edit/<int:pk>', EventDateSelectionEdit.as_view()),
     # path('event-date-selections/all', EventDateSelectionAllView.as_view()),
     # path('event-date-selections/result', EventDateSelectionResultView.as_view()),
 
