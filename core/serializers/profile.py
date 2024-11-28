@@ -4,6 +4,7 @@ from rest_framework import serializers
 class ProfileSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     username = serializers.CharField(max_length=150)
+    member_id = serializers.IntegerField()
     name = serializers.CharField(max_length=100)
     email = serializers.CharField(max_length=100)
 

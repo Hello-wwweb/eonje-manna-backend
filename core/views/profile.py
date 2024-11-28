@@ -32,6 +32,7 @@ class MemberListView(APIView):
         serializer = ProfileSerializer(data={
             "id": user.id,
             "username": user.username,
+            "member_id": user_member.id,
             "name": user_member.name,
             "email": user_member.email
         })
