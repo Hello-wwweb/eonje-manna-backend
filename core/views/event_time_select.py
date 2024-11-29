@@ -416,6 +416,7 @@ class EventDateSelectionSearchView(APIView):
             filtered_records = []
             for record in records:
                 for date, times in record.selected_dates.items():
+                    print(date, times)
                     parsed_date = datetime.strptime(date, "%Y-%m-%d")
                     
                     # 조건 확인
@@ -432,6 +433,7 @@ class EventDateSelectionSearchView(APIView):
                             continue
                     
                     # 조건을 만족하면 추가
+                    print(record)
                     filtered_records.append(record)
                     break
 
