@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Event, MeetingGroup
+from core.models import Event, MeetingGroup, Member, Membership
 from core.serializers.event import EventSerializer, \
     EventRequestforPatchSerializer, EventRequestSerializer
 
