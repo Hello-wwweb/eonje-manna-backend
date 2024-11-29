@@ -21,11 +21,23 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from core.views.event import EventDetailView, EventListView
+from core.views.event import EventDetailView, EventListView, MyEventListView
 from core.views.login import LoginView
+
 from core.views.group import MeetingGroupListView, MeetingGroupDetailView, GroupMemberListView
+from core.views.profile import MemberListView
+
 from core.views.membership import MembershipDetailView
 from core.views.signup import SignupView
+from core.views.meeting_group import (
+    group_list,
+    group_detail,
+    group_create,
+    group_delete,
+    group_edit,
+)
+from core.views.event_location_selection import EventLocationSelectionView
+from core.views.marker import MarkerSaveView, MarkerListView
 from core.views.vote import VoteListView
 
 schema_view = get_schema_view(
@@ -56,6 +68,13 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("login/", LoginView.as_view()),
     path("signup/", SignupView.as_view()),
+
+    path("api/markers/save", MarkerSaveView.as_view(), name="marker-save"),
+    path("api/markers/<event_id>", MarkerListView.as_view(), name="marker-list"),
+
+    path("profile/", MemberListView.as_view()),
+    path("events/", MyEventListView.as_view()),
+
     path("groups/", MeetingGroupListView.as_view()),
     path('event-date-selections/', EventDateSelectionView.as_view()),
     path('event-date-selections/<int:pk>', EventDateSelectionDetailView.as_view()),
@@ -65,11 +84,16 @@ urlpatterns = [
     path('event-date-selections/detail', EventDateSelectionDetailView.as_view()),
     path('event-date-selections/AvailableUsersCount', EventDateSelectionAvailableUsersCountView.as_view()),
     path("groups/<int:pk>", MeetingGroupDetailView.as_view()),
-    path('groups/<int:pk>/memberships/',MembershipDetailView.as_view()),
-    path('groups/<int:group_id>/members/', GroupMemberListView.as_view()),
-    path("groups/<int:group_id>/events/", EventListView.as_view()),
+
+    path("groups/<int:pk>/membership/", MembershipDetailView.as_view()),
+    path("groups/<int:group_id>/members", GroupMemberListView.as_view()),
+    path("groups/<int:group_id>/events", EventListView.as_view()),
     path("groups/<int:group_id>/events/<int:pk>", EventDetailView.as_view()),
-    path("votes/", VoteListView.as_view()),
+    path(
+        "api/events/<int:event_id>/votes/",
+        VoteListView.as_view(),
+        name="event-vote-list",
+    ),
 
 ]
 

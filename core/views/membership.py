@@ -9,7 +9,7 @@ from core.models import MeetingGroup, Member, Membership
 from core.serializers.meeting_group import MeetingGroupSerializer
 from drf_yasg.utils import swagger_auto_schema
 
-from core.serializers.membership import MembershipSerializer, MembershipInviteSerializer
+from core.serializers.membership import MembershipSerializer, MembershipInviteSerializer, MembershipNicknameSerializer
 
 
 
@@ -50,7 +50,7 @@ class MembershipDetailView(APIView):
             400: "Bad Request",
         },
     )
-    def put(self, request, pk):
+    def post(self, request, pk):
         obj = self.get_group(pk)
 
         # authenticate
@@ -74,6 +74,33 @@ class MembershipDetailView(APIView):
             "member" :invited_member.id,
             "group": obj.id,
             "nickname" : invited_member.name})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        request_body=MembershipNicknameSerializer,
+        responses={
+            200: MembershipSerializer(),
+            404: "Not Found",
+            403: "You ar not in this group",
+            400: "Bad Request",
+        },
+    )
+    def put(self, request, pk):
+        obj = self.get_group(pk)
+
+        # authenticate
+        user = request.user
+        user_member = Member.objects.get(user=user)
+        if not Membership.objects.filter(group=obj, member=user_member).exists():
+            return Response({"error": "You are not in this group"}, status=status.HTTP_403_FORBIDDEN)
+
+        # 닉넴 변경
+        user_membership = Membership.objects.get(member = user_member)
+        serializer = MembershipSerializer(user_membership,  data= request.data, partial = True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
