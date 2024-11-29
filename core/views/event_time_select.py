@@ -16,19 +16,19 @@ from core.serializers.event_time_selection import EventDateSelectionRequestSeria
 
 class EventDateSelectionView(APIView):
     @swagger_auto_schema(
-    request_body=EventDateSelectionRequestSerializer,
-    responses={
-        201: EventDateSelectionSerializer,
-        400: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "error": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
-            }
-        )
-    },
-    operation_summary="Create Event Date Selection",
-    operation_description="Creates a new EventDateSelection object with the provided member, event, and selected dates."
-)
+        request_body=EventDateSelectionRequestSerializer,
+        responses={
+            201: EventDateSelectionSerializer,
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                }
+            )
+        },
+        operation_summary="Create Event Date Selection",
+        operation_description="Creates a new EventDateSelection object with the provided member, event, and selected dates."
+    )
     def post(self, request):
         serializer = EventDateSelectionRequestSerializer(data=request.data)
         user = request.user
@@ -69,103 +69,98 @@ class EventDateSelectionView(APIView):
                 )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class EventDateSelectionDetailView(APIView):
-        @swagger_auto_schema(
-    manual_parameters=[
-        openapi.Parameter(
-            'pk',
-            openapi.IN_PATH,
-            description="Primary Key of the EventDateSelection",
-            type=openapi.TYPE_INTEGER,
-            required=True
-        )
-    ],
-    request_body=EventDateSelectionRequestSerializer,
-    responses={
-        200: EventDateSelectionSerializer,
-        403: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "error": openapi.Schema(type=openapi.TYPE_STRING, description="Permission denied")
-            }
-        ),
-        400: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "error": openapi.Schema(type=openapi.TYPE_STRING, description="Invalid input or Event ID mismatch")
-            }
-        ),
-        404: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "error": openapi.Schema(type=openapi.TYPE_STRING, description="Record not found")
-            }
-        )
-    },
-    operation_summary="Update Event Date Selection",
-    operation_description="Replaces the selected dates for the provided EventDateSelection, removing all existing entries."
-)
-        def patch(self, request, pk):  # 기존 데이터 삭제 후 새로운 데이터 추가
-            try:
-                # EventDateSelection 객체를 가져옵니다.
-                record = EventDateSelection.objects.get(pk=pk)
-            except EventDateSelection.DoesNotExist:
-                return Response(
-                    {"error": f"EventDateSelection with pk {pk} not found."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'pk',
+                openapi.IN_PATH,
+                description="Primary Key of the EventDateSelection",
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        request_body=EventDateSelectionRequestSerializer,
+        responses={
+            200: EventDateSelectionSerializer,
+            403: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Permission denied")
+                }
+            ),
+            400: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Invalid input or Event ID mismatch")
+                }
+            ),
+            404: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    "error": openapi.Schema(type=openapi.TYPE_STRING, description="Record not found")
+                }
+            )
+        },
+        operation_summary="Update Event Date Selection",
+        operation_description="Replaces the selected dates for the provided EventDateSelection, removing all existing entries."
+    )
+    def patch(self, request, pk):  # 기존 데이터 삭제 후 새로운 데이터 추가
+        try:
+            # EventDateSelection 객체를 가져옵니다.
+            record = EventDateSelection.objects.get(pk=pk)
+        except EventDateSelection.DoesNotExist:
+            return Response(
+                {"error": f"EventDateSelection with pk {pk} not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-            user = request.user
-            try:
-                # 현재 사용자에 해당하는 Member 객체를 가져옵니다.
-                request_member = Member.objects.get(user=user)
-            except Member.DoesNotExist:
-                return Response(
-                    {"error": "Member not found for the current user."},
-                    status=status.HTTP_404_NOT_FOUND
-                )   
+        user = request.user
+        try:
+            # 현재 사용자에 해당하는 Member 객체를 가져옵니다.
+            request_member = Member.objects.get(user=user)
+        except Member.DoesNotExist:
+            return Response(
+                {"error": "Member not found for the current user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
             # 권한 검사: 기록의 member와 요청한 member가 일치하는지 확인
-            if record.member != request_member:
-                return Response(
-                    {"error": "You do not have permission to modify this record."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        if record.member != request_member:
+            return Response(
+                {"error": "You do not have permission to modify this record."},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-            # 요청 데이터 유효성 검사
-            serializer = EventDateSelectionRequestSerializer(data=request.data)
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # 요청 데이터 유효성 검사
+        serializer = EventDateSelectionRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            validated_data = serializer.validated_data
-            date_to_update = validated_data["selected_dates"]
-            event_id = validated_data["event"]
+        validated_data = serializer.validated_data
+        date_to_update = validated_data["selected_dates"]
+        event_id = validated_data["event"]
 
-            # Event ID 확인
-            if event_id != record.event.id:
-                return Response(
-                    {"error": f"Event ID mismatch. Expected {record.event.id}, got {event_id}."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        # Event ID 확인
+        if event_id != record.event.id:
+            return Response(
+                {"error": f"Event ID mismatch. Expected {record.event.id}, got {event_id}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-            # 기존 데이터 삭제 및 새로운 데이터 추가
-            for date, times in date_to_update.items():
-                record.selected_dates[date] = times
+        # 기존 데이터 삭제 및 새로운 데이터 추가
+        for date, times in date_to_update.items():
+            record.selected_dates[date] = times
 
-            # 데이터 저장
-            record.save()
+        # 데이터 저장
+        record.save()
 
-            # 수정된 데이터를 직렬화하여 반환
-            response_serializer = EventDateSelectionSerializer(record)
-            return Response(response_serializer.data, status=status.HTTP_200_OK)
-   
-    
+        # 수정된 데이터를 직렬화하여 반환
+        response_serializer = EventDateSelectionSerializer(record)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
-    
-
-    
 
 # class EventDateSelectionResultView(APIView): 
 #     @swagger_auto_schema(
@@ -324,9 +319,6 @@ class EventDateSelectionDetailView(APIView):
 #         return Response(result, status=200)
 
 
-
-
-
 class EventDateSelectionSearchView(APIView):
     @swagger_auto_schema(
         manual_parameters=[
@@ -395,12 +387,11 @@ class EventDateSelectionSearchView(APIView):
         },
         operation_summary="Filter Event Date Selections by Multiple Criteria",
         operation_description=(
-            "Filters EventDateSelection records based on query parameters like member, event, year, month, day, or hour. "
-            "If no parameters are provided, it returns all records."
+                "Filters EventDateSelection records based on query parameters like member, event, year, month, day, or hour. "
+                "If no parameters are provided, it returns all records."
         )
     )
-    
-    def get(self, request): 
+    def get(self, request):
         member_id = request.query_params.get("member")
         event_id = request.query_params.get("event")
         year = request.query_params.get("year")
@@ -421,7 +412,7 @@ class EventDateSelectionSearchView(APIView):
                 filtered_selected_dates = {}
                 for date, times in record.selected_dates.items():
                     parsed_date = datetime.strptime(date, "%Y-%m-%d")
-                    
+
                     # 조건 확인
                     if year and parsed_date.year != int(year):
                         continue
@@ -442,8 +433,9 @@ class EventDateSelectionSearchView(APIView):
                     record.selected_dates = filtered_selected_dates
                     filtered_records.append(record)
 
-        
-        serializer = EventDateSelectionSerializer(filtered_records, many=True)
+            serializer = EventDateSelectionSerializer(filtered_records, many=True)
+        else:
+            serializer = EventDateSelectionSerializer(records, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -535,7 +527,7 @@ class EventDateSelectionAvailableUsersCountView(APIView):
         for record in records:
             for date, times in record.selected_dates.items():
                 parsed_date = datetime.strptime(date, "%Y-%m-%d")
-                
+
                 # 날짜 필터링
                 if year and parsed_date.year != int(year):
                     continue
@@ -543,7 +535,7 @@ class EventDateSelectionAvailableUsersCountView(APIView):
                     continue
                 if day and parsed_date.day != int(day):
                     continue
-                
+
                 # 날짜 키가 없다면 생성
                 if date not in available_users_count:
                     available_users_count[date] = {}
