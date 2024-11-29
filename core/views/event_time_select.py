@@ -412,8 +412,11 @@ class EventDateSelectionSearchView(APIView):
             records = records.filter(member__id=member_id)
         if event_id:
             records = records.filter(event__id=event_id)
+
+        filtered_records = []
+
         if year or month or day or hour:
-            filtered_records = []
+
             for record in records:
                 filtered_selected_dates = {}
                 for date, times in record.selected_dates.items():
