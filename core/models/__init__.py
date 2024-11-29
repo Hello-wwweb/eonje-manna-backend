@@ -6,6 +6,7 @@ from .vote import Vote
 from .event import Event
 from .event_data_selection import EventDateSelection
 from .event_location_selection import EventLocationSelection
+from .marker import Marker
 
 __all__ = [
     "User",
@@ -16,4 +17,5 @@ __all__ = [
     "Event",
     "EventDateSelection",
     "EventLocationSelection",
+    "Marker",
 ]
