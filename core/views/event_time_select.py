@@ -416,6 +416,7 @@ class EventDateSelectionSearchView(APIView):
             filtered_records = []
             for record in records:
                 for date, times in record.selected_dates.items():
+                    print("date")
                     print(date, times)
                     parsed_date = datetime.strptime(date, "%Y-%m-%d")
                     
