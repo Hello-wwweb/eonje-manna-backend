@@ -415,9 +415,8 @@ class EventDateSelectionSearchView(APIView):
         if year or month or day or hour:
             filtered_records = []
             for record in records:
+                filtered_selected_dates = {}
                 for date, times in record.selected_dates.items():
-                    print("date")
-                    print(date, times)
                     parsed_date = datetime.strptime(date, "%Y-%m-%d")
                     
                     # 조건 확인
@@ -432,16 +431,16 @@ class EventDateSelectionSearchView(APIView):
                         hour_matches = any(time.startswith(f"{int(hour):02d}") for time in times)
                         if not hour_matches:
                             continue
-                    
-                    # 조건을 만족하면 추가
-                    print(record)
-                    filtered_records.append(record)
-                    break
 
-            records = filtered_records
+                    filtered_selected_dates[date] = times
+
+                    # 필터링된 selected_dates가 있으면 기록에 추가
+                if filtered_selected_dates:
+                    record.selected_dates = filtered_selected_dates
+                    filtered_records.append(record)
 
         
-        serializer = EventDateSelectionSerializer(records, many=True)
+        serializer = EventDateSelectionSerializer(filtered_records, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
