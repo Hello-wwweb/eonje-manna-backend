@@ -38,7 +38,7 @@ from core.views.meeting_group import (
 )
 from core.views.event_location_selection import EventLocationSelectionView
 from core.views.marker import MarkerSaveView, MarkerListView
-from core.views.vote import VoteListView
+from core.views.vote import VoteListView, VoteListDetailView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -92,7 +92,7 @@ urlpatterns = [
     path("groups/<int:group_id>/events/<int:pk>", EventDetailView.as_view()),
     path(
         "api/events/<int:event_id>/votes/",
-        VoteListView.as_view(),
+        VoteListDetailView.as_view(),
         name="event-vote-list",
     ),
 
