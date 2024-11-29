@@ -127,12 +127,12 @@ class EventDateSelectionDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-            # 권한 검사: 기록의 member와 요청한 member가 일치하는지 확인
-        if record.member != request_member:
-            return Response(
-                {"error": "You do not have permission to modify this record."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        #     # 권한 검사: 기록의 member와 요청한 member가 일치하는지 확인
+        # if record.member != request_member:
+        #     return Response(
+        #         {"error": "You do not have permission to modify this record."},
+        #         status=status.HTTP_403_FORBIDDEN
+        #     )
 
         # 요청 데이터 유효성 검사
         serializer = EventDateSelectionRequestSerializer(data=request.data)
