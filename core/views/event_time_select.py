@@ -152,7 +152,14 @@ class EventDateSelectionDetailView(APIView):
 
         # 기존 데이터 삭제 및 새로운 데이터 추가
         for date, times in date_to_update.items():
-            record.selected_dates[date] = times
+            if not times:
+                # If the list is empty, you may either skip this date,
+                # or remove it from the selected_dates if that makes sense
+                # Example: You can choose to delete the entry from selected_dates
+                if date in record.selected_dates:
+                    del record.selected_dates[date]
+            else:
+                record.selected_dates[date] = times
 
         # 데이터 저장
         record.save()
