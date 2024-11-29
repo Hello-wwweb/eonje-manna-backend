@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.serializers.login import LoginSerializer
 
@@ -25,8 +26,17 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            login(request, user)
-            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
+            return Response(
+                {
+                    "message": "Login successful",
+                    "access_token": access_token,
+                    "refresh_token": str(refresh),
+                },
+                status=status.HTTP_200_OK,
+            )
         else:
             return Response(
                 {"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED

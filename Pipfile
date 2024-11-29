@@ -9,6 +9,8 @@ djangorestframework = "*"
 drf-yasg = "*"
 mysqlclient = "*"
 django-environ = "*"
+django-cors-headers = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 pre-commit = "*"

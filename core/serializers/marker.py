@@ -7,10 +7,10 @@ class MarkerSerializer(serializers.ModelSerializer):
         model = Marker
         fields = [
             "id",
-            "group_id",
+            "event_id",
             "member_id",
             "latitude",
             "longitude",
-            "address",
+            "place_name",
             "created_at",
         ]
